@@ -1,32 +1,32 @@
 package pattern.state
 
 enum class UserState(
-    val signUp : (User, String) -> Unit,
-    val verifyEmail : (User, String) -> Unit,
+    val signUp : User.(String) -> Unit,
+    val verifyEmail : User.(String) -> Unit,
     val viewContent : () -> Unit,
-    val viewProfile : (User) -> Unit,
-    val editProfile : (User, String) -> Unit,
+    val viewProfile : User.() -> Unit,
+    val editProfile : User.(String) -> Unit,
 ) {
     ANONYMOUS(
-        signUp = { user, email -> println("Signing up with email: $email."); user.email = email; user.state = UNVERIFIED },
-        verifyEmail = { _, _ -> println("You must sign up before verifying email.") },
+        signUp = { println("Signing up with email: $email."); email = it; state = UNVERIFIED },
+        verifyEmail = { println("You must sign up before verifying email.") },
         viewContent = { println("Viewing public content.") },
         viewProfile = { println("You must sign in to view your profile.") },
-        editProfile = { _, _ -> println("You must sign in to edit your profile.") },
+        editProfile = { println("You must sign in to edit your profile.") },
     ),
     UNVERIFIED(
-        signUp = { _, _ -> println("You are already signed up.") },
-        verifyEmail = { user, token -> println("Verifying email with token: ${token}."); user.state = AUTHENTICATED },
+        signUp = { println("You are already signed up.") },
+        verifyEmail = { println("Verifying email with token: $it."); state = AUTHENTICATED },
         viewContent = { println("Viewing personalized content for unverified account.") },
-        viewProfile = { user -> println("Profile: ${user.email} (Unverified account, please verify your email).") },
-        editProfile = { _, _ -> println("Please verify your account before editing your profile.") },
+        viewProfile = { println("Profile: $email (Unverified account, please verify your email).") },
+        editProfile = { println("Please verify your account before editing your profile.") },
     ),
     AUTHENTICATED(
-        signUp = { _, _ -> println("You are already signed up and authenticated.") },
-        verifyEmail = { _, _ -> println("You are already verified.") },
+        signUp = { println("You are already signed up and authenticated.") },
+        verifyEmail = { println("You are already verified.") },
         viewContent = { println("Viewing personalized content.") },
-        viewProfile = { user -> println("Profile: ${user.email} (Fully authenticated).") },
-        editProfile = { user, newEmail -> println("Updated email from ${user.email} to $newEmail.") },
+        viewProfile = { println("Profile: $email (Fully authenticated).") },
+        editProfile = { println("Updated email from $email to $it."); email = it },
     )
 }
 
