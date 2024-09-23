@@ -22,21 +22,18 @@ class ConsoleLogger : Logger {
     }
 }
 
-// Decorator
-abstract class LoggerDecorator(protected val logger: Logger) : Logger
-
 // Concrete Decorator
-class UniqueIdLogger(logger: Logger) : LoggerDecorator(logger) {
+class UniqueIdLogger(private val logger: Logger) : Logger {
     override fun log(message: String) = logger.log("[${UUID.randomUUID()}] $message")
 }
 
 // Concrete Decorator
-class ThreadNameLogger(logger: Logger) : LoggerDecorator(logger) {
+class ThreadNameLogger(private val logger: Logger) : Logger {
     override fun log(message: String) = logger.log("$message on ${Thread.currentThread().name} thread")
 }
 
 // Concrete Decorator
-class DateTimeLogger(logger: Logger, private val clock: Clock = Clock.Default) : LoggerDecorator(logger) {
+class DateTimeLogger(private val logger: Logger, private val clock: Clock = Clock.Default) : Logger {
     override fun log(message: String) = logger.log("[${clock.now()}] $message")
 }
 
