@@ -11,34 +11,24 @@ enum class Clock {
 }
 
 // Component
-interface Logger {
+fun interface Logger {
     fun log(message: String)
 }
 
 // Concrete Component
-class ConsoleLogger : Logger {
-    override fun log(message: String) {
-        println(message)
-    }
-}
+val consoleLogger = Logger { println(it) }
 
 // Concrete Decorator
-class UniqueIdLogger(private val logger: Logger) : Logger {
-    override fun log(message: String) = logger.log("[${UUID.randomUUID()}] $message")
-}
+fun Logger.withUniqueId() = Logger { log("[${UUID.randomUUID()}] $it") }
 
 // Concrete Decorator
-class ThreadNameLogger(private val logger: Logger) : Logger {
-    override fun log(message: String) = logger.log("$message on ${Thread.currentThread().name} thread")
-}
+fun Logger.withThreadName() = Logger { log("$it on ${Thread.currentThread().name} thread") }
 
 // Concrete Decorator
-class DateTimeLogger(private val logger: Logger, private val clock: Clock = Clock.Default) : Logger {
-    override fun log(message: String) = logger.log("[${clock.now()}] $message")
-}
+fun Logger.withDateTime(clock: Clock = Clock.Default) = Logger { log("[${clock.now()}] $it") }
 
 fun main() {
-    val logger = UniqueIdLogger(ThreadNameLogger(DateTimeLogger(ConsoleLogger())))
+    val logger = consoleLogger.withDateTime().withThreadName().withUniqueId()
 
     logger.log("Application init")
 }
