@@ -10,28 +10,38 @@ enum class Clock {
     }
 }
 
-class Logger(
-    private val includeDateTime: Boolean,
-    private val includeThreadName: Boolean,
-    private val includeUniqueId: Boolean,
-    private val clock: Clock
-) {
-    fun log(message: String) {
-        if (includeDateTime) print("[${clock.now()}]")
-        if (includeUniqueId) print("[${UUID.randomUUID()}]")
-        print(message)
-        if (includeThreadName) print(" on ${Thread.currentThread().name} thread")
-        println()
+// Component
+interface Logger {
+    fun log(message: String)
+}
+
+// Concrete Component
+class ConsoleLogger : Logger {
+    override fun log(message: String) {
+        println(message)
     }
 }
 
-fun main() {
-    val logger = Logger(
-        includeDateTime = true,
-        includeThreadName = true,
-        includeUniqueId = true,
-        clock = Clock.Default
-    )
+// Decorator
+abstract class LoggerDecorator(protected val logger: Logger) : Logger
 
-    logger.log(" Application init")
+// Concrete Decorator
+class UniqueIdLogger(logger: Logger) : LoggerDecorator(logger) {
+    override fun log(message: String) = logger.log("[${UUID.randomUUID()}] $message")
+}
+
+// Concrete Decorator
+class ThreadNameLogger(logger: Logger) : LoggerDecorator(logger) {
+    override fun log(message: String) = logger.log("$message on ${Thread.currentThread().name} thread")
+}
+
+// Concrete Decorator
+class DateTimeLogger(logger: Logger, private val clock: Clock = Clock.Default) : LoggerDecorator(logger) {
+    override fun log(message: String) = logger.log("[${clock.now()}] $message")
+}
+
+fun main() {
+    val logger = UniqueIdLogger(ThreadNameLogger(DateTimeLogger(ConsoleLogger())))
+
+    logger.log("Application init")
 }
