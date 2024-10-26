@@ -1,6 +1,5 @@
 package pattern.builder
 
-
 /**
  * @author: My Project
  * @Skype: chukimmuoi
@@ -11,8 +10,8 @@ package pattern.builder
  * Created by chukimmuoi on 26/10/24.
  */
 data class NotificationSetting(
-    val enable: Boolean,
-    val subscriptions: List<Subscription>
+    val enable: Boolean = false,
+    val subscriptions: List<Subscription> = emptyList()
 )
 
 data class Subscription(
@@ -29,31 +28,40 @@ sealed interface Destination
 @JvmInline value class PhoneNumber(val value: String): Destination
 
 fun main() {
-    createNotificationSettings()
+    createNotificationSettings(
+        EmailAddress("example@example.com"),
+        PhoneNumber("1-555-555-5555")
+    )
 }
 
 fun createNotificationSettings(
-    email: EmailAddress? = null,
-    phone: PhoneNumber? = null,
+    email: EmailAddress?,
+    phone: PhoneNumber?,
 ): NotificationSetting {
     return NotificationSetting(
-        enable = true,
-        subscriptions = listOf(
-            if (email != null) Subscription(
-                email,
-                Subscription.Topic.ANALYTICS,
-                Subscription.Frequency.DAILY
-            ),
-            if (email != null) Subscription(
-                email,
-                Subscription.Topic.NEWS,
-                Subscription.Frequency.WEEKLY
-            ),
-            if (phone != null) Subscription(
-                phone,
-                Subscription.Topic.SECURITY_ALERTS,
-                Subscription.Frequency.IMMEDIATELY
+        subscriptions = buildList {
+            if (email != null) add(
+                Subscription(
+                    email,
+                    Subscription.Topic.ANALYTICS,
+                    Subscription.Frequency.DAILY
+                )
             )
-        ) // Error
+            if (email != null) add(
+                Subscription(
+                    email,
+                    Subscription.Topic.NEWS,
+                    Subscription.Frequency.WEEKLY
+                )
+            )
+            if (phone != null) add(
+                Subscription(
+                    phone,
+                    Subscription.Topic.SECURITY_ALERTS,
+                    Subscription.Frequency.IMMEDIATELY
+                )
+            )
+        },
+        enable = true,
     )
 }
