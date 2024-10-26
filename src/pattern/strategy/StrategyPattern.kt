@@ -10,12 +10,14 @@ package pattern.strategy
  * Created by chukimmuoi on 26/10/24.
  */
 // Strategy
-typealias Validator = (String) -> Boolean
+fun interface Validator {
+    fun isValid(value: String): Boolean
+}
 
 // Concrete Strategy
-val emailValidator : Validator = { it.contains("@") && it.contains(".") }
-val usernameValidator : Validator = { it.isNotEmpty() }
-val passwordValidator : Validator = { it.length >= 8 }
+val emailValidator = Validator { it.contains("@") && it.contains(".") }
+val usernameValidator = Validator { it.isNotEmpty() }
+val passwordValidator = Validator { it.length >= 8 }
 
 // Context
 class FormField(
@@ -23,13 +25,13 @@ class FormField(
     val value: String,
     private val validator: Validator
 ) {
-    fun isValid() = validator(value)
+    fun isValid(): Boolean {
+        return validator.isValid(value)
+    }
 }
 
-fun Validator.optional(): Validator = { it.isEmpty() || this(it) }
-
 fun main() {
-    val emailField = FormField("email", "test@example.com", emailValidator.optional())
+    val emailField = FormField("email", "test@example.com", emailValidator)
     println("Email validation: ${emailField.isValid()}")
 
     val usernameField = FormField("username", "user123", usernameValidator)
