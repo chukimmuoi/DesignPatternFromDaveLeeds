@@ -10,22 +10,12 @@ package pattern.strategy
  * Created by chukimmuoi on 26/10/24.
  */
 // Strategy
-interface Validator {
-    fun isValid(value: String): Boolean
-}
+typealias Validator = (String) -> Boolean
 
 // Concrete Strategy
-class EmailValidator : Validator {
-    override fun isValid(value: String): Boolean = value.contains("@") && value.contains(".")
-}
-
-class UsernameValidator : Validator {
-    override fun isValid(value: String): Boolean = value.isNotEmpty()
-}
-
-class PasswordValidator : Validator {
-    override fun isValid(value: String): Boolean = value.length >= 8
-}
+val emailValidator : Validator = { it.contains("@") && it.contains(".") }
+val usernameValidator : Validator = { it.isNotEmpty() }
+val passwordValidator : Validator = { it.length >= 8 }
 
 // Context
 class FormField(
@@ -33,11 +23,18 @@ class FormField(
     val value: String,
     private val validator: Validator
 ) {
-    fun isValid(): Boolean {
-        return validator.isValid(value)
-    }
+    fun isValid() = validator(value)
 }
 
+fun Validator.optional(): Validator = { it.isEmpty() || this(it) }
+
 fun main() {
-        //...
+    val emailField = FormField("email", "test@example.com", emailValidator.optional())
+    println("Email validation: ${emailField.isValid()}")
+
+    val usernameField = FormField("username", "user123", usernameValidator)
+    println("Username validation: ${usernameField.isValid()}")
+
+    val passwordField = FormField("password", "password123", passwordValidator)
+    println("Password validation: ${passwordField.isValid()}")
 }
