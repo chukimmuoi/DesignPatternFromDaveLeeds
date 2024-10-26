@@ -32,25 +32,28 @@ fun main() {
     createNotificationSettings()
 }
 
-fun createNotificationSettings(): NotificationSetting {
+fun createNotificationSettings(
+    email: EmailAddress? = null,
+    phone: PhoneNumber? = null,
+): NotificationSetting {
     return NotificationSetting(
         enable = true,
         subscriptions = listOf(
-            Subscription(
-                EmailAddress("example@example.com"),
+            if (email != null) Subscription(
+                email,
                 Subscription.Topic.ANALYTICS,
                 Subscription.Frequency.DAILY
             ),
-            Subscription(
-                EmailAddress("example@example.com"),
+            if (email != null) Subscription(
+                email,
                 Subscription.Topic.NEWS,
                 Subscription.Frequency.WEEKLY
             ),
-            Subscription(
-                PhoneNumber("1-555-555-5555"),
+            if (phone != null) Subscription(
+                phone,
                 Subscription.Topic.SECURITY_ALERTS,
                 Subscription.Frequency.IMMEDIATELY
             )
-        )
+        ) // Error
     )
 }
