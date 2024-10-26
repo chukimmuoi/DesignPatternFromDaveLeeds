@@ -9,51 +9,32 @@ package pattern.strategy
  * @Project: DesignPatternFromDaveLeeds
  * Created by chukimmuoi on 26/10/24.
  */
-interface FromField {
-    val name: String
-    val value: String
-    fun isValid(): Boolean
+// Strategy
+interface Validator {
+    fun isValid(value: String): Boolean
 }
 
-class EmailField(override val value: String) : FromField {
-    override val name: String = "email"
-    override fun isValid(): Boolean {
-        return value.contains("@") && value.contains(".")
-    }
+// Concrete Strategy
+class EmailValidator : Validator {
+    override fun isValid(value: String): Boolean = value.contains("@") && value.contains(".")
 }
 
-class UsernameField(override val value: String) : FromField {
-    override val name: String = "username"
-    override fun isValid(): Boolean {
-        return value.isNotEmpty()
-    }
+class UsernameValidator : Validator {
+    override fun isValid(value: String): Boolean = value.isNotEmpty()
 }
 
-class PasswordField(override val value: String) : FromField {
-    override val name: String = "password"
-    override fun isValid(): Boolean {
-        return value.length >= 8
-    }
+class PasswordValidator : Validator {
+    override fun isValid(value: String): Boolean = value.length >= 8
 }
 
-class OptionEmailField(override val value: String = "") : FromField {
-    override val name: String = "email"
-    override fun isValid(): Boolean {
-        return value.isEmpty() || value.contains("@") && value.contains(".")
-    }
-}
-
-class OptionUsernameField(override val value: String = "") : FromField {
-    override val name: String = "username"
-    override fun isValid(): Boolean {
-        return value.isEmpty() || value.isNotEmpty()
-    }
-}
-
-class OptionPasswordField(override val value: String = "") : FromField {
-    override val name: String = "password"
-    override fun isValid(): Boolean {
-        return value.isEmpty() || value.length >= 8
+// Context
+class FormField(
+    val name: String,
+    val value: String,
+    private val validator: Validator
+) {
+    fun isValid(): Boolean {
+        return validator.isValid(value)
     }
 }
 
